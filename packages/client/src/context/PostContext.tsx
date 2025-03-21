@@ -1,16 +1,17 @@
 import {
   createContext,
-  ReactNode,
   useContext,
   useEffect,
   useState,
+  ReactNode,
 } from 'react';
-import { apiUrl } from '../config';
+// import { fetchPosts, addPost, deletePost, updatePost } from '../services/apiService';
 import { IPost, IPostCreate } from '../../../../shared/models';
+import { createPost, removePost, fetchPosts, modifyPost } from '../api/posts';
 
 interface PostContextType {
   posts: IPost[];
-  fetchPosts: () => void;
+  loadPosts: () => void;
   addPost: (post: IPostCreate | Partial<IPost>) => void;
   deletePost: (id: number) => void;
   updatePost: (post: Partial<IPost>) => void;
@@ -21,70 +22,57 @@ const PostContext = createContext<PostContextType | undefined>(undefined);
 export const PostProvider = ({ children }: { children: ReactNode }) => {
   const [posts, setPosts] = useState<IPost[]>([]);
 
-  const fetchPosts = async () => {
+  const loadPosts = async () => {
     try {
-      const response = await fetch(`${apiUrl}/posts`);
-      const data = await response.json();
-      setPosts(data);
+      const postsData = await fetchPosts();
+      setPosts(postsData);
     } catch (error) {
-      console.error('Failed to fetch posts:', error);
+      console.error('Error loading posts:', error);
     }
   };
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
   const addPost = async (newPost: IPostCreate | Partial<IPost>) => {
     try {
-      const response = await fetch(`${apiUrl}/posts`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newPost),
-      });
-      if (response.ok) {
-        fetchPosts(); // Refresh the posts after adding
-      }
+      const addedPost = await createPost(newPost);
+      setPosts((prevPosts) => [...prevPosts, addedPost]);
     } catch (error) {
-      console.error('Failed to add post:', error);
+      console.error('Error adding post:', error);
     }
   };
 
   const deletePost = async (id: number) => {
     try {
-      const response = await fetch(`${apiUrl}/posts/${id}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        fetchPosts(); // Refresh the posts after deleting
-      }
+      await removePost(id);
+      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
     } catch (error) {
-      console.error('Failed to delete post:', error);
+      console.error('Error deleting post:', error);
     }
   };
 
   const updatePost = async (updatedPost: Partial<IPost>) => {
     try {
-      const response = await fetch(`${apiUrl}/posts/${updatedPost.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedPost),
-      });
-      if (response.ok) {
-        fetchPosts(); // Refresh the posts after updating
-      }
+      const updated = await modifyPost(updatedPost);
+      setPosts((prevPosts) =>
+        prevPosts.map((post) => (post.id === updated.id ? updated : post)),
+      );
     } catch (error) {
-      console.error('Failed to update post:', error);
+      console.error('Error updating post:', error);
     }
   };
 
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
   return (
     <PostContext.Provider
-      value={{ posts, fetchPosts, addPost, deletePost, updatePost }}
+      value={{
+        posts,
+        loadPosts,
+        addPost,
+        deletePost,
+        updatePost,
+      }}
     >
       {children}
     </PostContext.Provider>

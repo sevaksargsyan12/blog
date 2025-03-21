@@ -3,7 +3,9 @@ import Post from '../models/Post';
 
 // Get all posts
 export const getAllPosts = async (): Promise<IPost[]> => {
-  return await Post.findAll();
+  return (await Post.findAll({
+    order: [['createdAt', 'DESC']],
+  })) as unknown as IPost[];
 };
 
 // Get a post by its ID

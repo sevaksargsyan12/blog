@@ -1,12 +1,15 @@
 import { Request, Response } from 'express';
 import * as postService from '../../services/postService'; // Importing service methods
-import { IPostCreate } from '../../../../../shared/models';
+import { IPost, IPostCreate } from '../../../../../shared/models';
 
 // Get all posts
-const getPosts = async (req: Request, res: Response): Promise<void> => {
+const getPosts = async (
+  req: Request,
+  res: Response,
+): Promise<Response<IPost[]> | undefined> => {
   try {
     const posts = await postService.getAllPosts();
-    res.json(posts);
+    return res.json(posts);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error retrieving posts' });
@@ -17,15 +20,14 @@ const getPosts = async (req: Request, res: Response): Promise<void> => {
 const getPostById = async (
   req: Request<{ id: string }, {}, {}>,
   res: Response,
-): Promise<void> => {
+): Promise<Response<IPost> | undefined> => {
   try {
     const post = await postService.getPostById(req.params.id);
     if (!post) {
-      res.status(404).json({ message: 'Post not found' });
-      return;
-    } else {
-      res.json(post);
+      return res.status(404).json({ message: 'Post not found' });
     }
+
+    return res.json(post);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error retrieving post' });
@@ -36,10 +38,11 @@ const getPostById = async (
 const createPost = async (
   req: Request<{}, {}, IPostCreate>,
   res: Response,
-): Promise<void> => {
+): Promise<Response<IPost> | undefined> => {
+  res.status(500).json({ error: 'Error while creating post' });
   try {
     const newPost = await postService.createNewPost(req.body);
-    res.status(201).json(newPost);
+    return res.status(201).json(newPost);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error while creating post' });
@@ -50,15 +53,14 @@ const createPost = async (
 const updatePost = async (
   req: Request<{ id: string }, {}, IPostCreate>,
   res: Response,
-): Promise<void> => {
+): Promise<Response<IPost[]> | undefined> => {
   try {
     const updatedPost = await postService.updateExistingPost(
       req.params.id,
       req.body,
     );
     if (!updatedPost) {
-      res.status(404).json({ message: 'Post not found' });
-      return;
+      return res.status(404).json({ message: 'Post not found' });
     } else {
       res.json(updatedPost);
     }
@@ -72,10 +74,10 @@ const updatePost = async (
 const deletePost = async (
   req: Request<{ id: string }, {}, {}>,
   res: Response,
-): Promise<void> => {
+): Promise<any> => {
   try {
     await postService.deletePostById(req.params.id);
-    res.status(204).send(); // No content, post deleted
+    return res.status(204).send(); // No content, post deleted
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Unable to delete posts...' });
