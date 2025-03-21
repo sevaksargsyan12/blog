@@ -1,17 +1,20 @@
 {
-  "name": "data-table",
+  "name": "Blog",
   "private": true,
   "scripts": {
-    "dev": "pnpm -C packages/server dev",
+    "dev": "concurrently \"pnpm -C packages/client dev\" \"pnpm -C packages/server dev\"",
     "prepare": "husky install",
-    "install-all": "pnpm install --recursive"
+    "lint": "concurrently \"pnpm -C packages/client lint\" \"pnpm -C packages/server lint\"",
+    "eslint-fix": "concurrently \"pnpm -C packages/client fix\" \"pnpm -C packages/server fix\"",
+    "install-all": "pnpm install --recursive",
+    "build": "pnpm -C packages/client build && pnpm -C packages/server build",
+    "start": "concurrently \"pnpm -C packages/client preview\" \"pnpm -C packages/server start\""
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
     "husky": "^8.0.0"
   },
   "dependencies": {
-    "eslint": "^9.20.1",
-    "pnpm": "^10.6.5"
+    "eslint": "^9.20.1"
   }
 }
