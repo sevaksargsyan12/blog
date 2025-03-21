@@ -22,14 +22,16 @@ export const createNewPost = async (postData: IPostCreate): Promise<IPost> => {
 export const updateExistingPost = async (
   id: string,
   postData: IPostCreate,
-): Promise<IPost | null> => {
-  const post = await Post.findByPk(id);
-  if (!post) return null;
+): Promise<IPost | null | void> => {
+  try {
+    const post = await Post.findByPk(id);
+    if (!post) return null;
 
-  post.title = postData.title;
-  post.content = postData.content;
-  await post.save();
-  return post;
+    await post.update({ ...postData });
+    return post;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 // Delete a post

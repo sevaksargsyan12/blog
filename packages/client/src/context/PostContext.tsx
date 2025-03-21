@@ -71,6 +71,7 @@ export const PostProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const updated = await modifyPost(updatedPost);
+      console.log({ updated });
       setPosts((prevPosts) =>
         prevPosts.map((post) => (post.id === updated.id ? updated : post)),
       );

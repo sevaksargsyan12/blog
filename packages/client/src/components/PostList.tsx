@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePosts } from '../context/PostContext';
 import { StatusType } from '../../../../shared/types';
-import formatDate from '../utils/date';
+import Modal from '../ui/Modal';
 
 const PostList: React.FC = () => {
   const { posts, deletePost, setEditingPost } = usePosts();
@@ -62,32 +62,9 @@ const PostList: React.FC = () => {
           </div>
         </div>
       ))}
-      {isModalOpen && <Modal post={selectedPost} closeModal={closeModal} />}
-    </div>
-  );
-};
-
-// Simple modal component to display post details
-const Modal = ({ post, closeModal }: any) => {
-  return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-5 rounded">
-        <h3 className="text-xl font-bold">{post.title}</h3>
-        <h6 className="italic font-bold text-gray-400 text-[16px]">
-          <span className="text-black">Status:</span> {post.status}
-        </h6>
-        <h6 className="italic font-bold text-gray-400 text-[16px]">
-          <span className="text-black">Creation date:</span>{' '}
-          {formatDate(post.createdAt)}
-        </h6>
-        <p>{post.content}</p>
-        <button
-          onClick={closeModal}
-          className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Close
-        </button>
-      </div>
+      {isModalOpen && selectedPost && (
+        <Modal post={selectedPost} closeModal={closeModal} />
+      )}
     </div>
   );
 };
