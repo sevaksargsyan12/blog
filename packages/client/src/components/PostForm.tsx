@@ -31,12 +31,24 @@ const PostForm: React.FC = () => {
     setEditingPost(null);
   };
 
+  const resetEdit = () => {
+    reset();
+    setEditingPost(null);
+  };
+
   return (
     <div className="bordered border-2 border-b-blue-950 rounded-3xl p-4 m-4">
       <h1 className="text-4xl text-center">
-        {' '}
         {editingPost ? 'Edit Post' : 'Create Post'}
       </h1>
+      {editingPost && (
+        <button
+          onClick={() => resetEdit()}
+          className="bg-gray-400 block mx-auto mt-2 hover:bg-blue-400 text-center text-white font-bold py-2 px-4 rounded"
+        >
+          Switch to Creating post +
+        </button>
+      )}
       <form onSubmit={handleSubmit(onSubmit)} className="p-4">
         <div className="mb-2 bg-primary">
           <label htmlFor="title" className="block mb-2">

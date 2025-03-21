@@ -10,6 +10,7 @@ a {
 }
 
 button {
+  cursor: pointer;
   border-radius: 8px;
   box-shadow: 4px 4px 4px #e4e1e1;
   opacity: 0.8;

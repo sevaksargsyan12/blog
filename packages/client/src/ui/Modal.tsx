@@ -11,7 +11,7 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ post, closeModal }) => {
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-5 rounded">
+      <div className="bg-white p-5 rounded mx-auto w-5/6 sm:w-full sm:max-w-xl">
         <h3 className="text-xl font-bold">{post.title}</h3>
         <h6 className="italic font-bold text-gray-400 text-[16px]">
           <span className="text-black">Status:</span> {post.status}
