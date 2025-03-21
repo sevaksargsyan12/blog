@@ -6,12 +6,12 @@ import { apiUrl } from './config';
 function App() {
   console.log('URL-->', apiUrl);
   return (
-    <PostProvider>
-      <div className="App bg-theme-dark">
+    <div className="App bg-theme-dark relative">
+      <PostProvider>
         <PostForm />
         <PostList />
-      </div>
-    </PostProvider>
+      </PostProvider>
+    </div>
   );
 }
 

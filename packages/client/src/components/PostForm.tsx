@@ -2,13 +2,8 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { usePosts } from '../context/PostContext';
 import { IPost, IPostCreate } from '../../../../shared/models';
-import { fetchPostById } from '../api/posts';
 
-interface PostFormProps {
-  id?: number; // Optional id for editing a post
-}
-
-const PostForm: React.FC<PostFormProps> = ({ id }) => {
+const PostForm: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -16,76 +11,79 @@ const PostForm: React.FC<PostFormProps> = ({ id }) => {
     setValue,
     formState: { errors },
   } = useForm<IPostCreate | Partial<IPost>>();
-  const { addPost, updatePost } = usePosts();
+  const { addPost, updatePost, editingPost, setEditingPost } = usePosts();
 
   useEffect(() => {
-    if (id) {
-      const fetchPostData = async () => {
-        const postData = await fetchPostById(id);
-        if (postData) {
-          Object.keys(postData).forEach((field) => {
-            setValue(field as keyof IPost, postData[field]);
-          });
-        }
-      };
-      fetchPostData();
+    if (editingPost) {
+      (Object.keys(editingPost) as Array<keyof IPost>).forEach((field) => {
+        setValue(field, editingPost[field]);
+      });
     }
-  }, [id, setValue]);
+  }, [editingPost, setValue]);
 
   const onSubmit = (data: IPostCreate | Partial<IPost>) => {
-    if (id) {
-      updatePost({ ...data, id });
+    if (editingPost) {
+      updatePost({ ...data, id: editingPost.id });
     } else {
       addPost(data as IPostCreate);
     }
     reset();
+    setEditingPost(null);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="p-4">
-      <div className="mb-2 bg-primary">
-        <label htmlFor="title" className="block mb-2">
-          Title:
-        </label>
-        <input
-          {...register('title', { required: 'Title is required' })}
-          className="border p-1 w-full"
-        />
-        {errors.title && (
-          <p className="text-red-500 text-xs italic">{errors.title.message}</p>
-        )}
-      </div>
-      <div className="mb-2">
-        <label htmlFor="content" className="block mb-2">
-          Content:
-        </label>
-        <textarea
-          {...register('content', { required: 'Content is required' })}
-          className="border p-1 w-full"
-        />
-        {errors.content && (
-          <p className="text-red-500 text-xs italic">
-            {errors.content.message}
-          </p>
-        )}
-      </div>
-      <div className="mb-2">
-        <label htmlFor="status" className="block mb-2">
-          Status:
-        </label>
-        <select {...register('status')} className="border p-1 w-full">
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-          <option value="private">Private</option>
-        </select>
-      </div>
-      <button
-        type="submit"
-        className="bg-blue-500 text-white p-2 cursor-pointer"
-      >
-        {id ? 'Update' : 'Create'}
-      </button>
-    </form>
+    <div className="bordered border-2 border-b-blue-950 rounded-3xl p-4 m-4">
+      <h1 className="text-4xl text-center">
+        {' '}
+        {editingPost ? 'Edit Post' : 'Create Post'}
+      </h1>
+      <form onSubmit={handleSubmit(onSubmit)} className="p-4">
+        <div className="mb-2 bg-primary">
+          <label htmlFor="title" className="block mb-2">
+            Title:
+          </label>
+          <input
+            {...register('title', { required: 'Title is required' })}
+            className="border p-1 w-full"
+          />
+          {errors.title && (
+            <p className="text-red-500 text-xs italic">
+              {errors.title.message}
+            </p>
+          )}
+        </div>
+        <div className="mb-2">
+          <label htmlFor="content" className="block mb-2">
+            Content:
+          </label>
+          <textarea
+            {...register('content', { required: 'Content is required' })}
+            className="border p-1 w-full"
+          />
+          {errors.content && (
+            <p className="text-red-500 text-xs italic">
+              {errors.content.message}
+            </p>
+          )}
+        </div>
+        <div className="mb-2">
+          <label htmlFor="status" className="block mb-2">
+            Status:
+          </label>
+          <select {...register('status')} className="border p-1 w-full">
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          {editingPost ? 'Update' : 'Create'}
+        </button>
+      </form>
+    </div>
   );
 };
 
