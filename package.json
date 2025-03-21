@@ -1,0 +1,17 @@
+{
+  "name": "data-table",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -C packages/server dev",
+    "prepare": "husky install",
+    "install-all": "pnpm install --recursive"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "husky": "^8.0.0"
+  },
+  "dependencies": {
+    "eslint": "^9.20.1",
+    "pnpm": "^10.6.5"
+  }
+}
